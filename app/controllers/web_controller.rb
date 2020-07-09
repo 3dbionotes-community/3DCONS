@@ -23,6 +23,12 @@ class WebController < ApplicationController
        logger.error "Bad file_data: #{file_data.class.name}: #{file_data.inspect}"
     end
 
+    if params[:uniref_version]
+      uniref_version = params[:uniref_version]
+    else
+      uniref_version = "uniref100"
+    end
+
     pdb_collection = []
     pdb_list.each do |p|
       if p.length == 6
@@ -52,7 +58,7 @@ class WebController < ApplicationController
       db.execute( "select * from pdbsTable where pdb=\"#{p[0]}\""+ch_ ) do |r|
         pdb_to_id[ p[0] ][ r[1] ] = { 'seq_id'=>r[2] }
         pdb_to_id[ p[0] ][ r[1] ]['statuts'] = {}
-        db.execute( "select stepNum,status_uniref100 from pdbChainIterStatus where pdb=\"#{p[0]}\" and chain=\"#{r[1]}\";" ) do |s|
+        db.execute( "select stepNum,status_#{uniref_version} from pdbChainIterStatus where pdb=\"#{p[0]}\" and chain=\"#{r[1]}\";" ) do |s|
           pdb_to_id[ p[0] ][ r[1] ]['statuts'][s[0]] = s[1]
         end
         flag = 0
