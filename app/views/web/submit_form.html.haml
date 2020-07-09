@@ -39,4 +39,10 @@
       = file_field_tag( :file_list )
       %br
       %br
+      %div.text
+        Select your Uniref version
+      = select_tag "uniref_version", options_for_select([ "uniref90", "uniref100" ], "uniref100")
+      %br
+      %br
       = button_tag("Submit")
+
