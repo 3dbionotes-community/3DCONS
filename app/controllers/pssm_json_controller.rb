@@ -115,4 +115,22 @@ class PssmJsonController < ApplicationController
     end
     return mapping
   end
+
+  def pssm_list_ids
+    initial = params[:initial]
+    if initial =~ /\A\d+\Z/
+      query = "SELECT pdb,chain FROM pdbChainIterStatus WHERE status_uniref100=0 AND pdb LIKE '#{initial}___' GROUP BY pdb,chain;"
+    else
+      return render :json => {:error => "Bad or missing parameter", :msg => "Please provide PDB Id initial as parameter, e.g. http://3dcons.cnb.csic.es/pssm_json/list/1"}, :status => 400
+    end
+
+    pdb_list = []
+    db = SQLite3::Database.new PDB_PSSM_DB
+    db.execute(query) do |r|
+      pdb = {"pdbId" => r[0], "chainId" => r[1]}
+      pdb_list.push(pdb)
+    end
+    return render :json => {"KnownPdbIds": pdb_list}
+  end
+
 end
